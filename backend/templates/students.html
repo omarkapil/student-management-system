@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Students - Helwan International Technological University{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-users"></i> Students</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('students.export_students') }}" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-file-csv"></i> Export CSV
+                </a>
+                <a href="{{ url_for('students.add_student') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Student
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <form method="GET" action="{{ url_for('students.search_students') }}" class="d-flex">
+                    <select name="search_by" class="form-select me-2" style="width: auto;">
+                        <option value="name">Name</option>
+                        <option value="student_code">Student Code</option>
+                        <option value="course">Course</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <input type="text" name="q" class="form-control me-2" placeholder="Search students..." required>
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                {% if students.items %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> Name</th>
+                                <th><i class="fas fa-id-card"></i> Student Code</th>
+                                <th><i class="fas fa-envelope"></i> Email</th>
+                                <th><i class="fas fa-book"></i> Course</th>
+                                <th><i class="fas fa-calendar"></i> Year</th>
+                                <th><i class="fas fa-calendar-plus"></i> Date Added</th>
+                                <th><i class="fas fa-cogs"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students.items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2">{{ student.name[0].upper() }}</div>
+                                        {{ student.name }}
+                                    </div>
+                                </td>
+                                <td><code>{{ student.student_code }}</code></td>
+                                <td>{{ student.email }}</td>
+                                <td><span class="badge bg-primary">{{ student.course }}</span></td>
+                                <td><span class="badge bg-info">{{ student.year }}</span></td>
+                                <td>{{ student.date_created.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('students.edit_student', id=student.id) }}"
+                                           class="btn btn-outline-primary btn-sm" title="Edit student">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                onclick="confirmDelete({{ student.id }}, '{{ student.name | replace("'", "\\'") }}')"
+                                                title="Delete student">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <p>No students found. <a href="{{ url_for('students.add_student') }}">Add the first student</a>.</p>
+                </div>
+                {% endif %}
+
+                <!-- Pagination -->
+                {% if students.pages > 1 %}
+                <nav aria-label="Student pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if students.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('students.list_students', page=students.prev_num) }}">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for page_num in students.iter_pages() %}
+                            {% if page_num %}
+                                <li class="page-item {% if page_num == students.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('students.list_students', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if students.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('students.list_students', page=students.next_num) }}">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden CSRF-protected delete form (HCI: Robustness - confirmation dialog) -->
+<form id="deleteForm" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
+
+<script>
+// Delete confirmation (HCI: Robustness principle)
+function confirmDelete(studentId, studentName) {
+    if (confirm('Are you sure you want to delete student "' + studentName + '"?\nThis action cannot be undone.')) {
+        const form = document.getElementById('deleteForm');
+        form.action = '/students/delete/' + studentId;
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

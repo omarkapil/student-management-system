@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Add Student - Helwan International Technological University{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2><i class="fas fa-user-plus"></i> Add Student</h2>
+    </div>
+</div>
+
+<div class="row mt-4 justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-plus"></i> Student Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="addStudentForm" novalidate>
+                    <!-- CSRF Token: protects against Cross-Site Request Forgery -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-user"></i> Full Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name"
+                                   required minlength="2" maxlength="150"
+                                   placeholder="Enter student's full name">
+                            <div class="invalid-feedback">Full name is required (min 2 characters).</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="student_code" class="form-label">
+                                <i class="fas fa-id-card"></i> Student Code <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="student_code" name="student_code"
+                                   required placeholder="e.g. 0001234 or STU-0001234"
+                                   oninput="previewCode(this.value)">
+                            <div class="form-text">
+                                Enter 7 digits — prefix <strong>STU-</strong> is added automatically.
+                            </div>
+                            <div id="codePreview" class="mt-1 text-info fw-bold" style="font-size:.9em;"></div>
+                            <div class="invalid-feedback" id="codeError">
+                                Student code must be exactly 7 digits.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               required placeholder="Enter email address">
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="course" class="form-label">
+                                <i class="fas fa-book"></i> Course <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="course" name="course" required>
+                                <option value="" disabled selected>Select Course</option>
+                                <option value="AI">🤖 AI</option>
+                                <option value="Cyber Security">🔒 Cyber Security</option>
+                                <option value="Data Science">📊 Data Science</option>
+                                <option value="Software Engineering">💻 Software Engineering</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a course.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="year" class="form-label">
+                                <i class="fas fa-calendar"></i> Academic Year <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="year" name="year" required>
+                                <option value="" disabled selected>Select Year</option>
+                                <option value="1st Year">1️⃣ 1st Year</option>
+                                <option value="2nd Year">2️⃣ 2nd Year</option>
+                                <option value="3rd Year">3️⃣ 3rd Year</option>
+                                <option value="4th Year">4️⃣ 4th Year</option>
+                            </select>
+                            <div class="invalid-feedback">Please select an academic year.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Student
+                        </button>
+                        <a href="{{ url_for('students.list_students') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Live preview of the normalized student code
+function previewCode(val) {
+    const preview = document.getElementById('codePreview');
+    const raw = val.replace(/\s/g, '').toUpperCase();
+    let normalised = '';
+    if (raw.startsWith('STU-'))      normalised = raw;
+    else if (raw.startsWith('STU'))  normalised = 'STU-' + raw.slice(3).replace(/^-/, '');
+    else if (raw)                    normalised = 'STU-' + raw;
+
+    if (normalised) {
+        const valid = /^STU-\d{7}$/.test(normalised);
+        preview.textContent = valid ? '✅ Will be saved as: ' + normalised
+                                    : '⚠ Preview: ' + normalised + ' (needs 7 digits)';
+        preview.className   = valid ? 'mt-1 text-success fw-bold' : 'mt-1 text-warning fw-bold';
+    } else {
+        preview.textContent = '';
+    }
+}
+
+// Client-side form validation (HCI: Error Prevention)
+document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+    const codeInput = document.getElementById('student_code');
+    const raw       = codeInput.value.replace(/\s/g, '').toUpperCase();
+    let normalised  = raw.startsWith('STU-') ? raw
+                    : raw.startsWith('STU')  ? 'STU-' + raw.slice(3).replace(/^-/, '')
+                    : 'STU-' + raw;
+
+    if (!/^STU-\d{7}$/.test(normalised)) {
+        e.preventDefault();
+        codeInput.classList.add('is-invalid');
+        document.getElementById('codeError').style.display = 'block';
+    } else {
+        codeInput.classList.remove('is-invalid');
+    }
+
+    if (!this.checkValidity()) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    this.classList.add('was-validated');
+});
+</script>
+{% endblock %}

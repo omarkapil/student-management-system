@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Helwan International Technological University{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <form method="GET" action="{{ url_for('students.search_students') }}" class="d-flex">
+                    <select name="search_by" class="form-select me-2" style="width: auto;">
+                        <option value="name">Name</option>
+                        <option value="student_code">Student Code</option>
+                        <option value="course">Course</option>
+                        <option value="year">Year</option>
+                    </select>
+                    <input type="text" name="q" class="form-control me-2" placeholder="Search students...">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card stats-card bg-primary text-white h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-users fa-3x opacity-75"></i>
+                </div>
+                <h5 class="card-title">Total Students</h5>
+                <h2>{{ total_students }}</h2>
+                <small class="opacity-75">Active Enrollments</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card stats-card bg-success text-white h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-graduation-cap fa-3x opacity-75"></i>
+                </div>
+                <h5 class="card-title">Courses</h5>
+                <h2>4</h2>
+                <small class="opacity-75">Available Programs</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card stats-card bg-info text-white h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-calendar-alt fa-3x opacity-75"></i>
+                </div>
+                <h5 class="card-title">Academic Year</h5>
+                <h2>2026</h2>
+                <small class="opacity-75">Current Year</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Students</h5>
+                <a href="{{ url_for('students.list_students') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> View All
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-user"></i> Name</th>
+                                <th><i class="fas fa-id-card"></i> Student Code</th>
+                                <th><i class="fas fa-envelope"></i> Email</th>
+                                <th><i class="fas fa-book"></i> Course</th>
+                                <th><i class="fas fa-calendar"></i> Year</th>
+                                <th><i class="fas fa-calendar-plus"></i> Date Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in recent_students %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2">
+                                            {{ student.name[0].upper() }}
+                                        </div>
+                                        {{ student.name }}
+                                    </div>
+                                </td>
+                                <td><code>{{ student.student_code }}</code></td>
+                                <td>{{ student.email }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ student.course }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ student.year }}</span>
+                                </td>
+                                <td>{{ student.date_created.strftime('%b %d, %Y') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student - Helwan International Technological University{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2><i class="fas fa-edit"></i> Edit Student</h2>
+    </div>
+</div>
+
+<div class="row mt-4 justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Edit Student Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="editStudentForm" novalidate>
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-user"></i> Full Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name"
+                                   value="{{ student.name }}" required minlength="2" maxlength="150"
+                                   placeholder="Enter student's full name">
+                            <div class="invalid-feedback">Full name is required (min 2 characters).</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="student_code" class="form-label">
+                                <i class="fas fa-id-card"></i> Student Code <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="student_code" name="student_code"
+                                   value="{{ student.student_code }}" required
+                                   oninput="previewCode(this.value)">
+                            <div class="form-text">Format: <strong>STU-XXXXXXX</strong> (7 digits)</div>
+                            <div id="codePreview" class="mt-1 fw-bold" style="font-size:.9em;"></div>
+                            <div class="invalid-feedback" id="codeError">
+                                Student code must follow STU-XXXXXXX format (7 digits).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               value="{{ student.email }}" required placeholder="Enter email address">
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="course" class="form-label">
+                                <i class="fas fa-book"></i> Course <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="course" name="course" required>
+                                <option value="" disabled {% if not student.course %}selected{% endif %}>Select Course</option>
+                                <option value="AI" {% if student.course == 'AI' %}selected{% endif %}>🤖 AI</option>
+                                <option value="Cyber Security" {% if student.course == 'Cyber Security' %}selected{% endif %}>🔒 Cyber Security</option>
+                                <option value="Data Science" {% if student.course == 'Data Science' %}selected{% endif %}>📊 Data Science</option>
+                                <option value="Software Engineering" {% if student.course == 'Software Engineering' %}selected{% endif %}>💻 Software Engineering</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a course.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="year" class="form-label">
+                                <i class="fas fa-calendar"></i> Academic Year <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="year" name="year" required>
+                                <option value="" disabled {% if not student.year %}selected{% endif %}>Select Year</option>
+                                <option value="1st Year" {% if student.year == '1st Year' %}selected{% endif %}>1️⃣ 1st Year</option>
+                                <option value="2nd Year" {% if student.year == '2nd Year' %}selected{% endif %}>2️⃣ 2nd Year</option>
+                                <option value="3rd Year" {% if student.year == '3rd Year' %}selected{% endif %}>3️⃣ 3rd Year</option>
+                                <option value="4th Year" {% if student.year == '4th Year' %}selected{% endif %}>4️⃣ 4th Year</option>
+                            </select>
+                            <div class="invalid-feedback">Please select an academic year.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Student
+                        </button>
+                        <a href="{{ url_for('students.list_students') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewCode(val) {
+    const preview = document.getElementById('codePreview');
+    const raw = val.replace(/\s/g, '').toUpperCase();
+    let normalised = raw.startsWith('STU-') ? raw
+                   : raw.startsWith('STU')  ? 'STU-' + raw.slice(3).replace(/^-/, '')
+                   : raw ? 'STU-' + raw : '';
+    if (normalised) {
+        const valid = /^STU-\d{7}$/.test(normalised);
+        preview.textContent = valid ? '✅ ' + normalised : '⚠ ' + normalised + ' (needs 7 digits)';
+        preview.className   = valid ? 'mt-1 text-success fw-bold' : 'mt-1 text-warning fw-bold';
+    } else {
+        preview.textContent = '';
+    }
+}
+
+document.getElementById('editStudentForm').addEventListener('submit', function(e) {
+    const codeInput = document.getElementById('student_code');
+    const raw       = codeInput.value.replace(/\s/g, '').toUpperCase();
+    let n           = raw.startsWith('STU-') ? raw
+                    : raw.startsWith('STU')  ? 'STU-' + raw.slice(3).replace(/^-/, '')
+                    : 'STU-' + raw;
+    if (!/^STU-\d{7}$/.test(n)) {
+        e.preventDefault();
+        codeInput.classList.add('is-invalid');
+    } else {
+        codeInput.classList.remove('is-invalid');
+    }
+    if (!this.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+    this.classList.add('was-validated');
+});
+
+// Show live preview on page load for existing value
+previewCode(document.getElementById('student_code').value);
+</script>
+{% endblock %}
