@@ -13,18 +13,30 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <form method="GET" action="{{ url_for('students.search_students') }}" class="d-flex">
-                    <select name="search_by" class="form-select me-2" style="width: auto;">
-                        <option value="name"         {% if search_by == 'name' %}selected{% endif %}>Name</option>
-                        <option value="student_code" {% if search_by == 'student_code' %}selected{% endif %}>Student Code</option>
-                        <option value="course"       {% if search_by == 'course' %}selected{% endif %}>Course</option>
-                        <option value="year"         {% if search_by == 'year' %}selected{% endif %}>Year</option>
-                    </select>
-                    <input type="text" name="q" class="form-control me-2"
-                           value="{{ query }}" placeholder="Search students..." required>
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="fas fa-search"></i> Search
-                    </button>
+                <form method="GET" action="{{ url_for('students.search_students') }}">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <select name="search_by" class="form-select" style="width: auto;">
+                            <option value="name"         {% if search_by == 'name' %}selected{% endif %}>Name</option>
+                            <option value="student_code" {% if search_by == 'student_code' %}selected{% endif %}>Student Code</option>
+                            <option value="course"       {% if search_by == 'course' %}selected{% endif %}>Course</option>
+                            <option value="year"         {% if search_by == 'year' %}selected{% endif %}>Year</option>
+                        </select>
+                        <input type="text" name="q" class="form-control" style="width: auto;"
+                               value="{{ query }}" placeholder="Search students...">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap mt-2">
+                        <label class="text-white small mb-0">From:</label>
+                        <input type="date" name="date_from" class="form-control"
+                               style="width:auto;" title="Search from date"
+                               value="{{ date_from or '' }}">
+                        <label class="text-white small mb-0">To:</label>
+                        <input type="date" name="date_to" class="form-control"
+                               style="width:auto;" title="Search to date"
+                               value="{{ date_to or '' }}">
+                    </div>
                 </form>
             </div>
         </div>
@@ -38,10 +50,21 @@
                 <span>
                     <i class="fas fa-list"></i>
                     {% if students %}
-                        Found <strong>{{ students | length }}</strong> result(s) for
-                        "<strong>{{ query }}</strong>" in <em>{{ search_by }}</em>
+                        Found <strong>{{ students | length }}</strong> result(s)
+                        {% if query %} for "<strong>{{ query }}</strong>" in <em>{{ search_by }}</em>{% endif %}
+                        {% if date_from or date_to %}
+                            &nbsp;|&nbsp;
+                            {% if date_from %}From: <strong>{{ date_from }}</strong>{% endif %}
+                            {% if date_to %} To: <strong>{{ date_to }}</strong>{% endif %}
+                        {% endif %}
                     {% else %}
-                        No results for "<strong>{{ query }}</strong>"
+                        No results
+                        {% if query %} for "<strong>{{ query }}</strong>"{% endif %}
+                        {% if date_from or date_to %}
+                            &nbsp;|&nbsp;
+                            {% if date_from %}From: <strong>{{ date_from }}</strong>{% endif %}
+                            {% if date_to %} To: <strong>{{ date_to }}</strong>{% endif %}
+                        {% endif %}
                     {% endif %}
                 </span>
                 <a href="{{ url_for('students.list_students') }}" class="btn btn-outline-secondary btn-sm">
@@ -86,7 +109,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <button type="button" class="btn btn-outline-danger btn-sm"
-                                                onclick="confirmDelete({{ student.id }}, '{{ student.name | replace("'", "\\'") }}')"
+                                                onclick="confirmDelete('/students/delete/{{ student.id }}', '{{ student.name | replace("'", "\\'") }}')"
                                                 title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -108,18 +131,8 @@
     </div>
 </div>
 
-<!-- CSRF-protected delete form -->
+<!-- CSRF-protected delete form (submitted by the modal) -->
 <form id="deleteForm" method="POST" style="display:none;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 </form>
-
-<script>
-function confirmDelete(studentId, studentName) {
-    if (confirm('Are you sure you want to delete student "' + studentName + '"?\nThis action cannot be undone.')) {
-        const form = document.getElementById('deleteForm');
-        form.action = '/students/delete/' + studentId;
-        form.submit();
-    }
-}
-</script>
 {% endblock %}

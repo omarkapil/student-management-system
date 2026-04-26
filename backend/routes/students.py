@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required
 from models import db, Student
@@ -149,6 +150,8 @@ def delete_student(id):
 def search_students():
     query     = sanitize_text(request.args.get('q', ''))
     search_by = request.args.get('search_by', 'name')
+    date_from = request.args.get('date_from', '').strip()
+    date_to   = request.args.get('date_to', '').strip()
 
     allowed_fields = {'name', 'student_code', 'course', 'year'}
     if search_by not in allowed_fields:
@@ -161,14 +164,72 @@ def search_students():
         'year':         Student.year,
     }
 
-    students_list = (
-        Student.query.filter(field_map[search_by].ilike(f'%{query}%')).all()
-        if query else []
-    )
+    base_query = Student.query
+
+    if query:
+        base_query = base_query.filter(field_map[search_by].ilike(f'%{query}%'))
+
+    if date_from:
+        try:
+            df = datetime.strptime(date_from, '%Y-%m-%d')
+            base_query = base_query.filter(Student.date_created >= df)
+        except ValueError:
+            date_from = ''
+
+    if date_to:
+        try:
+            dt = datetime.strptime(date_to, '%Y-%m-%d') + timedelta(days=1)
+            base_query = base_query.filter(Student.date_created < dt)
+        except ValueError:
+            date_to = ''
+
+    students_list = base_query.all() if (query or date_from or date_to) else []
 
     return render_template(
         'search_results.html',
-        students=students_list, query=query, search_by=search_by
+        students=students_list, query=query, search_by=search_by,
+        date_from=date_from, date_to=date_to
+    )
+
+
+@students_bp.route('/courses')
+@login_required
+def list_courses():
+    COURSE_ICONS = {
+        'AI':                   'fas fa-robot',
+        'Cyber Security':       'fas fa-shield-alt',
+        'Data Science':         'fas fa-chart-bar',
+        'Software Engineering': 'fas fa-laptop-code',
+    }
+    COURSE_COLORS = {
+        'AI':                   'primary',
+        'Cyber Security':       'danger',
+        'Data Science':         'success',
+        'Software Engineering': 'info',
+    }
+    all_courses = ['AI', 'Cyber Security', 'Data Science', 'Software Engineering']
+    students_all = Student.query.order_by(Student.name).all()
+
+    grouped = {c: [] for c in all_courses}
+    for s in students_all:
+        if s.course in grouped:
+            grouped[s.course].append(s)
+        else:
+            grouped[s.course] = [s]
+
+    # Include any courses not in the predefined list
+    for c in list(grouped.keys()):
+        if c not in all_courses:
+            all_courses.append(c)
+            COURSE_ICONS[c]  = 'fas fa-book'
+            COURSE_COLORS[c] = 'secondary'
+
+    return render_template(
+        'courses.html',
+        grouped=grouped,
+        all_courses=all_courses,
+        course_icons=COURSE_ICONS,
+        course_colors=COURSE_COLORS,
     )
 
 

@@ -23,17 +23,27 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <form method="GET" action="{{ url_for('students.search_students') }}" class="d-flex">
-                    <select name="search_by" class="form-select me-2" style="width: auto;">
-                        <option value="name">Name</option>
-                        <option value="student_code">Student Code</option>
-                        <option value="course">Course</option>
-                        <option value="year">Year</option>
-                    </select>
-                    <input type="text" name="q" class="form-control me-2" placeholder="Search students..." required>
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="fas fa-search"></i> Search
-                    </button>
+                <form method="GET" action="{{ url_for('students.search_students') }}">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <select name="search_by" class="form-select" style="width: auto;">
+                            <option value="name">Name</option>
+                            <option value="student_code">Student Code</option>
+                            <option value="course">Course</option>
+                            <option value="year">Year</option>
+                        </select>
+                        <input type="text" name="q" class="form-control" style="width: auto;" placeholder="Search students...">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap mt-2">
+                        <label class="text-white small mb-0">From:</label>
+                        <input type="date" name="date_from" class="form-control"
+                               style="width:auto;" title="Search from date">
+                        <label class="text-white small mb-0">To:</label>
+                        <input type="date" name="date_to" class="form-control"
+                               style="width:auto;" title="Search to date">
+                    </div>
                 </form>
             </div>
         </div>
@@ -79,7 +89,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <button type="button" class="btn btn-outline-danger btn-sm"
-                                                onclick="confirmDelete({{ student.id }}, '{{ student.name | replace("'", "\\'") }}')"
+                                                onclick="confirmDelete('/students/delete/{{ student.id }}', '{{ student.name | replace("'", "\\'") }}')"
                                                 title="Delete student">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -132,19 +142,8 @@
     </div>
 </div>
 
-<!-- Hidden CSRF-protected delete form (HCI: Robustness - confirmation dialog) -->
+<!-- Hidden CSRF-protected delete form (submitted by the modal) -->
 <form id="deleteForm" method="POST" style="display:none;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 </form>
-
-<script>
-// Delete confirmation (HCI: Robustness principle)
-function confirmDelete(studentId, studentName) {
-    if (confirm('Are you sure you want to delete student "' + studentName + '"?\nThis action cannot be undone.')) {
-        const form = document.getElementById('deleteForm');
-        form.action = '/students/delete/' + studentId;
-        form.submit();
-    }
-}
-</script>
 {% endblock %}

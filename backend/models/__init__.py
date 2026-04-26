@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     email         = db.Column(db.String(150), unique=True, nullable=False)
     password      = db.Column(db.String(300), nullable=False)   # scrypt hash
     date_created  = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active     = db.Column(db.Boolean, default=True, nullable=False)
 
     # Brute-force protection fields
     failed_logins = db.Column(db.Integer, default=0, nullable=False)

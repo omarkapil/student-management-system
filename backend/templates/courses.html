@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Courses - Helwan International Technological University{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-graduation-cap"></i> Courses</h2>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('students.add_student') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Student
+                </a>
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course summary badges -->
+<div class="row mt-3">
+    {% for course in all_courses %}
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card text-white bg-{{ course_colors[course] }} h-100">
+            <div class="card-body text-center py-3">
+                <i class="{{ course_icons[course] }} fa-2x mb-2 opacity-75"></i>
+                <h6 class="card-title mb-1">{{ course }}</h6>
+                <h3 class="mb-0">{{ grouped[course] | length }}</h3>
+                <small class="opacity-75">{{ 'student' if grouped[course] | length == 1 else 'students' }}</small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Accordion: one panel per course -->
+<div class="row mt-2">
+    <div class="col-md-12">
+        <div class="accordion" id="coursesAccordion">
+            {% for course in all_courses %}
+            <div class="accordion-item mb-3 border-0 shadow-sm">
+                <h2 class="accordion-header" id="heading-{{ loop.index }}">
+                    <button class="accordion-button {% if not loop.first %}collapsed{% endif %} fw-bold"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse-{{ loop.index }}"
+                            aria-expanded="{{ 'true' if loop.first else 'false' }}"
+                            aria-controls="collapse-{{ loop.index }}">
+                        <i class="{{ course_icons[course] }} me-2 text-{{ course_colors[course] }}"></i>
+                        {{ course }}
+                        <span class="badge bg-{{ course_colors[course] }} ms-2">
+                            {{ grouped[course] | length }}
+                        </span>
+                    </button>
+                </h2>
+                <div id="collapse-{{ loop.index }}"
+                     class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                     aria-labelledby="heading-{{ loop.index }}"
+                     data-bs-parent="#coursesAccordion">
+                    <div class="accordion-body p-0">
+                        {% if grouped[course] %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th><i class="fas fa-user"></i> Name</th>
+                                        <th><i class="fas fa-id-card"></i> Student Code</th>
+                                        <th><i class="fas fa-envelope"></i> Email</th>
+                                        <th><i class="fas fa-calendar"></i> Year</th>
+                                        <th><i class="fas fa-calendar-plus"></i> Date Added</th>
+                                        <th><i class="fas fa-cogs"></i> Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in grouped[course] %}
+                                    <tr>
+                                        <td class="text-muted">{{ loop.index }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">{{ student.name[0].upper() }}</div>
+                                                {{ student.name }}
+                                            </div>
+                                        </td>
+                                        <td><code>{{ student.student_code }}</code></td>
+                                        <td>{{ student.email }}</td>
+                                        <td><span class="badge bg-info">{{ student.year }}</span></td>
+                                        <td>{{ student.date_created.strftime('%b %d, %Y') }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('students.edit_student', id=student.id) }}"
+                                                   class="btn btn-outline-primary btn-sm" title="Edit student">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                                        onclick="confirmDelete('/students/delete/{{ student.id }}', '{{ student.name | replace("'", "\\'") }}')"
+                                                        title="Delete student">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-user-slash fa-2x mb-2"></i>
+                            <p class="mb-2">No students enrolled in this course yet.</p>
+                            <a href="{{ url_for('students.add_student') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-plus"></i> Add Student
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- CSRF-protected delete form (submitted by the modal) -->
+<form id="deleteForm" method="POST" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
+{% endblock %}

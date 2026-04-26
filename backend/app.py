@@ -43,10 +43,12 @@ from models import User, Student
 from routes.auth import auth_bp as auth
 from routes.students import students_bp as students
 from routes.dashboard import dashboard_bp as dashboard
+from routes.users import users_bp as users
 
 app.register_blueprint(auth)
 app.register_blueprint(students)
 app.register_blueprint(dashboard)
+app.register_blueprint(users)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -67,6 +69,16 @@ if __name__ == '__main__':
             columns = [row[1] for row in result]
             if 'year' not in columns:
                 db.session.execute(db.text('ALTER TABLE students ADD COLUMN year VARCHAR(50)'))
+                db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        # Ensure is_active column exists for existing user tables
+        try:
+            result = db.session.execute(db.text("PRAGMA table_info(user)")).all()
+            columns = [row[1] for row in result]
+            if 'is_active' not in columns:
+                db.session.execute(db.text('ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 1 NOT NULL'))
                 db.session.commit()
         except Exception:
             db.session.rollback()

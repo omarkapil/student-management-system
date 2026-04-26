@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Add New User - Helwan International Technological University{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-plus fa-3x text-primary"></i>
+                </div>
+                <h4 class="mb-0">Add New User</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="addUserForm" novalidate>
+                    <!-- CSRF Token -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               required minlength="3" maxlength="150"
+                               placeholder="Choose a username" autocomplete="username">
+                        <div class="invalid-feedback">Username must be at least 3 characters.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               required placeholder="Enter email address"
+                               autocomplete="email">
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password"
+                                   required minlength="8" placeholder="Minimum 8 characters"
+                                   autocomplete="new-password" oninput="checkStrength(this.value)">
+                            <button class="btn btn-outline-secondary" type="button" id="togglePwd">
+                                <i class="fas fa-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                        <!-- Password Strength Indicator -->
+                        <div class="mt-2" id="strengthBar" style="display:none;">
+                            <div class="progress" style="height:6px;">
+                                <div class="progress-bar" id="strengthFill" role="progressbar"></div>
+                            </div>
+                            <small id="strengthLabel" class="text-muted"></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">
+                            <i class="fas fa-lock"></i> Confirm Password
+                        </label>
+                        <input type="password" class="form-control" id="confirm_password"
+                               name="confirm_password" required
+                               placeholder="Repeat password" autocomplete="new-password">
+                        <div class="invalid-feedback" id="confirmFeedback">Passwords must match.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="fas fa-user-plus"></i> Add User
+                    </button>
+                </form>
+                <div class="text-center">
+                    <a href="{{ url_for('users.list_users') }}" class="text-decoration-none">
+                        <i class="fas fa-arrow-left"></i> Cancel — back to User Management
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Client-side validation with password-match check
+    document.getElementById('addUserForm').addEventListener('submit', function (e) {
+        const pwd     = document.getElementById('password');
+        const confirm = document.getElementById('confirm_password');
+        const feedback = document.getElementById('confirmFeedback');
+
+        if (pwd.value !== confirm.value) {
+            confirm.setCustomValidity('Passwords do not match.');
+            feedback.textContent = 'Passwords must match.';
+        } else {
+            confirm.setCustomValidity('');
+        }
+
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        this.classList.add('was-validated');
+    });
+
+    // Clear custom validity on input so the user can correct it
+    document.getElementById('confirm_password').addEventListener('input', function () {
+        this.setCustomValidity('');
+    });
+
+    // Password show/hide
+    document.getElementById('togglePwd').addEventListener('click', function () {
+        const pwd  = document.getElementById('password');
+        const icon = document.getElementById('eyeIcon');
+        pwd.type   = pwd.type === 'password' ? 'text' : 'password';
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    });
+
+    // Password strength indicator (HCI: Robustness - guides user)
+    function checkStrength(value) {
+        const bar   = document.getElementById('strengthBar');
+        const fill  = document.getElementById('strengthFill');
+        const label = document.getElementById('strengthLabel');
+        bar.style.display = value.length ? 'block' : 'none';
+
+        let score = 0;
+        if (value.length >= 8)           score++;
+        if (value.length >= 12)          score++;
+        if (/[A-Z]/.test(value))         score++;
+        if (/[0-9]/.test(value))         score++;
+        if (/[^A-Za-z0-9]/.test(value))  score++;
+
+        const levels = [
+            { pct: 20,  cls: 'bg-danger',  text: 'Very Weak'   },
+            { pct: 40,  cls: 'bg-warning', text: 'Weak'        },
+            { pct: 60,  cls: 'bg-info',    text: 'Fair'        },
+            { pct: 80,  cls: 'bg-primary', text: 'Strong'      },
+            { pct: 100, cls: 'bg-success', text: 'Very Strong' },
+        ];
+        const lvl = levels[Math.min(score, 4)];
+        fill.style.width  = lvl.pct + '%';
+        fill.className    = 'progress-bar ' + lvl.cls;
+        label.textContent = 'Strength: ' + lvl.text;
+    }
+</script>
+{% endblock %}
