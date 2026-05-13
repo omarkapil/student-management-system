@@ -10,12 +10,12 @@ Each team member covers a specific set of HCI principles with a defined speaking
 
 | **\#** | **Speaker**  | **Topics Covered**                      | **HCI Principles**     | **Time**     |
 |--------|--------------|-----------------------------------------|------------------------|--------------|
-| **1**  | **Person 1** | Introduction + Visibility + Consistency | Principles 1 & 2       | **\~1:30**   |
-| **2**  | **Person 2** | Familiarity + Affordance                | Principles 3 & 4       | **\~1:30**   |
-| **3**  | **Person 3** | Navigation + Control                    | Principles 5 & 6       | **\~1:40**   |
-| **4**  | **Person 4** | Feedback + Recovery + Constraints       | Principles 7, 8 & 9    | **\~2:00**   |
-| **5**  | **Person 5** | Flexibility + Style + Conviviality      | Principles 10, 11 & 12 | **\~1:50**   |
-| **6**  | **Person 6** | 8 Security Mechanisms + Conclusion      | Cybersecurity          | **\~2:30**   |
+| **1**  | **omar kapil Person 1** | Introduction + Visibility + Consistency | Principles 1 & 2       | **\~1:30**   |
+| **2**  | **yousef ali Person 2** | Familiarity + Affordance                | Principles 3 & 4       | **\~1:30**   |
+| **3**  | **mazin alaa Person 3** | Navigation + Control                    | Principles 5 & 6       | **\~1:40**   |
+| **4**  | **shaban Person 4** | Feedback + Recovery + Constraints       | Principles 7, 8 & 9    | **\~2:00**   |
+| **5**  | **elshaf3y Person 5** | Flexibility + Style + Conviviality      | Principles 10, 11 & 12 | **\~1:50**   |
+| **6**  | **yousef abdelhady Person 6** | 8 Security Mechanisms + Conclusion      | Cybersecurity          | **\~2:30**   |
 |        |              | **Total Video Length**                  |                        | **≈ 11 min** |
 
 # ② (Code Division --- Screen Recording Guide) {#code-division-screen-recording-guide}
@@ -111,7 +111,7 @@ This table tells each person which files to open and screen-record while they ar
 
 # ③ (Detailed Speaker Notes) {#detailed-speaker-notes}
 
-## Person 1 --- Intro + Visibility + Consistency (\~1:30 \| Principles 1 & 2) {#person-1-intro-visibility-consistency-130-principles-1-2}
+## omar kapil Person 1 --- Intro + Visibility + Consistency (\~1:30 \| Principles 1 & 2) {#person-1-intro-visibility-consistency-130-principles-1-2}
 
 - Open: show the GitHub repo URL + project name on screen
 
@@ -125,7 +125,7 @@ This table tells each person which files to open and screen-record while they ar
 
 - Bootstrap classes: same navbar, same color scheme across all pages
 
-## Person 2 --- Familiarity + Affordance (\~1:30 \| Principles 3 & 4) {#person-2-familiarity-affordance-130-principles-3-4}
+## yousef ali Person 2 --- Familiarity + Affordance (\~1:30 \| Principles 3 & 4) {#person-2-familiarity-affordance-130-principles-3-4}
 
 - Font Awesome icons: magnifier (search), pencil (edit), trash (delete), plus (add)
 
@@ -137,7 +137,7 @@ This table tells each person which files to open and screen-record while they ar
 
 - Search bar: wide field + icon + button = recognizable pattern
 
-## Person 3 --- Navigation + Control (\~1:40 \| Principles 5 & 6) {#person-3-navigation-control-140-principles-5-6}
+## mazin alaa Person 3 --- Navigation + Control (\~1:40 \| Principles 5 & 6) {#person-3-navigation-control-140-principles-5-6}
 
 - Fixed top navbar: Dashboard, Students, Add Student, Logout
 
@@ -153,7 +153,7 @@ This table tells each person which files to open and screen-record while they ar
 
 - No auto-submit, no forced workflows
 
-## Person 4 --- Feedback + Recovery + Constraints (\~2:00 \| Principles 7, 8 & 9) {#person-4-feedback-recovery-constraints-200-principles-7-8-9}
+## shaban Person 4 --- Feedback + Recovery + Constraints (\~2:00 \| Principles 7, 8 & 9) {#person-4-feedback-recovery-constraints-200-principles-7-8-9}
 
 - Flash message: green \'Student added successfully\' --- show the code in routes/students.py
 
@@ -173,7 +173,7 @@ This table tells each person which files to open and screen-record while they ar
 
 - Required fields: form won\'t submit until satisfied
 
-## Person 5 --- Flexibility + Style + Conviviality (\~1:50 \| Principles 10, 11 & 12) {#person-5-flexibility-style-conviviality-150-principles-10-11-12}
+## elshaf3y Person 5 --- Flexibility + Style + Conviviality (\~1:50 \| Principles 10, 11 & 12) {#person-5-flexibility-style-conviviality-150-principles-10-11-12}
 
 - Search: filter by Name, Student Code, Course, or Year --- show routes/students.py
 
@@ -191,7 +191,7 @@ This table tells each person which files to open and screen-record while they ar
 
 - Helper text under input fields
 
-## Person 6 --- 8 Security Mechanisms + Conclusion (\~2:30 \| Cybersecurity) {#person-6-8-security-mechanisms-conclusion-230-cybersecurity}
+## yousef abdelhady Person 6 --- 8 Security Mechanisms + Conclusion (\~2:30 \| Cybersecurity) {#person-6-8-security-mechanisms-conclusion-230-cybersecurity}
 
 - 1\. Password Hashing: show bcrypt/scrypt in models/\_\_init\_\_.py
 
